@@ -1,0 +1,18 @@
+{
+  "name": "好味小馆",
+  "appid": "__UNI__SHOP_DEMO",
+  "description": "好味小馆堂食点餐与外带预订",
+  "versionName": "0.1.0",
+  "versionCode": "10",
+  "transformPx": false,
+  "mp-weixin": {
+    "appid": "wxcaa9ab1be0f6e7c3",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "postcss": true,
+      "minified": true
+    },
+    "usingComponents": true
+  }
+}

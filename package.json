@@ -1,0 +1,19 @@
+{
+  "name": "shop-platform",
+  "private": true,
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "dev:admin": "pnpm --filter @shop/admin dev",
+    "build:admin": "pnpm --filter @shop/admin build",
+    "typecheck:admin": "pnpm --filter @shop/admin typecheck",
+    "dev:mini:h5": "pnpm --filter @shop/mini dev:h5",
+    "build:mini:h5": "pnpm --filter @shop/mini build:h5",
+    "dev:mini:mp-weixin": "pnpm --filter @shop/mini dev:mp-weixin",
+    "build:mini:mp-weixin": "pnpm --filter @shop/mini build:mp-weixin",
+    "typecheck:mini": "pnpm --filter @shop/mini typecheck",
+    "api": "cargo run -p shop-api"
+  }
+}

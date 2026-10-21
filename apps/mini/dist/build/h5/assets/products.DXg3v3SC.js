@@ -1,0 +1,1 @@
+import{r as t,a}from"./request.Cp4ELWzK.js";function n(t){return{...t,image_url:t.image_url?a(t.image_url):null}}async function r(a=""){const r=a.trim(),u=["status=active"];r&&u.push(`q=${encodeURIComponent(r)}`);return(await t(`/products?${u.join("&")}`)).map(n)}async function u(a){return n(await t(`/products/${a}`))}export{u as a,r as g};

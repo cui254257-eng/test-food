@@ -1,0 +1,1 @@
+"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const e=require("./common/vendor.js");Math;const o={onLaunch(){console.info("Shop mini app launched")}};function n(){return{app:e.createSSRApp(o)}}n().app.mount("#app"),exports.createApp=n;

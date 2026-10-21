@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "我的",
+  "navigationBarBackgroundColor": "#f6f7f9",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#f6f7f9",
+  "usingComponents": {
+    "wd-icon": "../../node-modules/@wot-ui/ui/components/wd-icon/wd-icon"
+  }
+}

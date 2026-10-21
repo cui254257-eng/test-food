@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "确认订单",
+  "navigationBarBackgroundColor": "#f6f4f0",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#f6f4f0",
+  "usingComponents": {
+    "wd-button": "../../node-modules/@wot-ui/ui/components/wd-button/wd-button"
+  }
+}

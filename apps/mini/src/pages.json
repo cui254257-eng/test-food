@@ -1,0 +1,148 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "好味小馆",
+        "navigationBarBackgroundColor": "#f6f7f9",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f6f7f9",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/profile/index",
+      "style": {
+        "navigationBarTitleText": "我的",
+        "navigationBarBackgroundColor": "#f6f7f9",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f6f7f9"
+      }
+    },
+    {
+      "path": "pages/cart/index",
+      "style": {
+        "navigationBarTitleText": "购物车",
+        "navigationBarBackgroundColor": "#f6f7f9",
+        "navigationBarTextStyle": "black"
+      }
+    },
+    {
+      "path": "pages/checkout/index",
+      "style": {
+        "navigationBarTitleText": "确认订单",
+        "navigationBarBackgroundColor": "#f6f4f0",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f6f4f0"
+      }
+    }
+  ],
+  "subPackages": [
+    {
+      "root": "subpackages/menu",
+      "name": "menu",
+      "pages": [
+        {
+          "path": "pages/products/index",
+          "style": {
+            "navigationBarTitleText": "今日菜单",
+            "navigationBarBackgroundColor": "#f4f2ed",
+            "navigationBarTextStyle": "black",
+            "backgroundColor": "#f4f2ed",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "pages/product/detail",
+          "style": {
+            "navigationBarTitleText": "菜品详情",
+            "navigationBarBackgroundColor": "#ffffff",
+            "navigationBarTextStyle": "black"
+          }
+        }
+      ]
+    },
+    {
+      "root": "subpackages/account",
+      "name": "account",
+      "pages": [
+        {
+          "path": "pages/login/index",
+          "style": {
+            "navigationBarTitleText": "登录",
+            "navigationBarBackgroundColor": "#f7f3ed",
+            "navigationBarTextStyle": "black",
+            "backgroundColor": "#f7f3ed"
+          }
+        },
+        {
+          "path": "pages/profile/edit",
+          "style": {
+            "navigationBarTitleText": "编辑资料",
+            "navigationBarBackgroundColor": "#f5f2ec",
+            "navigationBarTextStyle": "black",
+            "backgroundColor": "#f5f2ec"
+          }
+        },
+        {
+          "path": "pages/address/index",
+          "style": {
+            "navigationBarTitleText": "收货地址",
+            "navigationBarBackgroundColor": "#f4f2ed",
+            "navigationBarTextStyle": "black",
+            "backgroundColor": "#f4f2ed"
+          }
+        },
+        {
+          "path": "pages/address/edit",
+          "style": {
+            "navigationBarTitleText": "编辑收货地址",
+            "navigationBarBackgroundColor": "#f4f2ed",
+            "navigationBarTextStyle": "black",
+            "backgroundColor": "#f4f2ed"
+          }
+        }
+      ]
+    }
+  ],
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^wd-(.*)": "@wot-ui/ui/components/wd-$1/wd-$1.vue"
+    }
+  },
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "好味小馆",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f6f7f9",
+    "backgroundTextStyle": "light"
+  },
+  "tabBar": {
+    "color": "#8a929e",
+    "selectedColor": "#b86a49",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "static/tabbar/home.png",
+        "selectedIconPath": "static/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/cart/index",
+        "text": "购物车",
+        "iconPath": "static/tabbar/cart.png",
+        "selectedIconPath": "static/tabbar/cart-active.png"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的",
+        "iconPath": "static/tabbar/my.png",
+        "selectedIconPath": "static/tabbar/my-active.png"
+      }
+    ]
+  }
+}
