@@ -1,1 +1,0 @@
-"use strict";const r=require("./request.js");exports.getBanners=async function(){return(await r.request("/banners")).map(e=>({...e,image_url:r.assetUrl(e.image_url),background_image_url:e.background_image_url?r.assetUrl(e.background_image_url):null}))};

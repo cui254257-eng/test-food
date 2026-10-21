@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "菜品详情",
-  "navigationBarBackgroundColor": "#ffffff",
-  "navigationBarTextStyle": "black",
-  "usingComponents": {
-    "wd-button": "../../../../node-modules/@wot-ui/ui/components/wd-button/wd-button"
-  }
-}

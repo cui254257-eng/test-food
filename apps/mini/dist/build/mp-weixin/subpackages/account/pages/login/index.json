@@ -1,9 +1,0 @@
-{
-  "navigationBarTitleText": "登录",
-  "navigationBarBackgroundColor": "#f7f3ed",
-  "navigationBarTextStyle": "black",
-  "backgroundColor": "#f7f3ed",
-  "usingComponents": {
-    "wd-icon": "../../../../node-modules/@wot-ui/ui/components/wd-icon/wd-icon"
-  }
-}

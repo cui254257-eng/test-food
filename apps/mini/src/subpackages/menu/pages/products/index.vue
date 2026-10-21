@@ -45,6 +45,7 @@ function refreshCart() {
 
 function updateLine(line: CartLine, delta: number) {
   cartLines.value = setCartLineQuantity(line.key, line.quantity + delta);
+  if (!cartLines.value.length) cartExpanded.value = false;
 }
 
 function formatSelections(line: CartLine) {
