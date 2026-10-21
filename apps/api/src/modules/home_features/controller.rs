@@ -1,7 +1,7 @@
 use axum::{
     Json,
     extract::{Path, State},
-    http::StatusCode,
+    http::{HeaderMap, StatusCode},
 };
 
 use crate::{app::AppState, common::ApiError};
@@ -16,8 +16,10 @@ pub(crate) async fn list(
 
 pub(crate) async fn create(
     State(state): State<AppState>,
+    headers: HeaderMap,
     Json(input): Json<HomeFeatureInput>,
 ) -> Result<(StatusCode, Json<HomeFeature>), ApiError> {
+    state.authenticate_admin(&headers)?;
     Ok((
         StatusCode::CREATED,
         Json(state.home_features.create(input).await?),
@@ -26,16 +28,20 @@ pub(crate) async fn create(
 
 pub(crate) async fn update(
     State(state): State<AppState>,
+    headers: HeaderMap,
     Path(id): Path<i64>,
     Json(input): Json<HomeFeatureInput>,
 ) -> Result<Json<HomeFeature>, ApiError> {
+    state.authenticate_admin(&headers)?;
     Ok(Json(state.home_features.update(id, input).await?))
 }
 
 pub(crate) async fn delete(
     State(state): State<AppState>,
+    headers: HeaderMap,
     Path(id): Path<i64>,
 ) -> Result<StatusCode, ApiError> {
+    state.authenticate_admin(&headers)?;
     state.home_features.delete(id).await?;
     Ok(StatusCode::NO_CONTENT)
 }

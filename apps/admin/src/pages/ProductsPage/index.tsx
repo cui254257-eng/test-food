@@ -43,7 +43,7 @@ export default function ProductsPage() {
     setImageFile(null)
     setImagePreview('')
     form.resetFields()
-    form.setFieldsValue({ name: '', category: '主食盖饭', description: '', specifications: [], price: 0, stock: 0, status: 'active' })
+    form.setFieldsValue({ name: '', category: '主食盖饭', description: '', specifications: [], price: 0, stock: 0, status: 'active', discount_eligible: true })
     setOpen(true)
   }
 
@@ -59,6 +59,7 @@ export default function ProductsPage() {
       price: product.price,
       stock: product.stock,
       status: product.status,
+      discount_eligible: product.discount_eligible,
     })
     setOpen(true)
   }
@@ -133,6 +134,7 @@ export default function ProductsPage() {
     { title: '菜品描述', dataIndex: 'description', key: 'description', ellipsis: true, render: (text: string) => text || '—' },
     { title: '售价（元/份）', dataIndex: 'price', key: 'price', width: 140, render: (price: number) => <strong>{currency.format(price)}</strong> },
     { title: '可售份数', dataIndex: 'stock', key: 'stock', width: 100 },
+    { title: '会员折扣', dataIndex: 'discount_eligible', key: 'discount_eligible', width: 110, render: (eligible: boolean) => <Tag color={eligible ? 'blue' : 'default'}>{eligible ? '参与' : '不参与'}</Tag> },
     { title: '状态', dataIndex: 'status', key: 'status', width: 110, render: (status: Product['status']) => <Tag color={status === 'active' ? 'green' : 'default'}>{status === 'active' ? '可点餐' : '暂停售卖'}</Tag> },
     { title: '操作', key: 'action', width: 150, render: (_, product) => <Space><Button type="link" onClick={() => openEdit(product)}>编辑</Button><Popconfirm title="确定删除这道菜品？" onConfirm={() => void removeProduct(product.id)}><Button type="link" danger>删除</Button></Popconfirm></Space> },
   ]
@@ -248,6 +250,9 @@ export default function ProductsPage() {
           </Space>
           <Form.Item name="status" label="状态" rules={[{ required: true }]}>
             <Select options={[{ value: 'active', label: '可点餐' }, { value: 'inactive', label: '暂停售卖' }]} />
+          </Form.Item>
+          <Form.Item name="discount_eligible" label="参与会员折扣" valuePropName="checked">
+            <Switch checkedChildren="参与" unCheckedChildren="不参与" />
           </Form.Item>
         </Form>
       </Modal>

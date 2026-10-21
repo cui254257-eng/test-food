@@ -63,6 +63,7 @@ function addToCart(showToast = true) {
     name: product.value.name,
     image_url: product.value.image_url,
     unit_price: selectedPrice.value,
+    discount_eligible: product.value.discount_eligible,
     quantity: 1,
     stock: product.value.stock,
     selections,
@@ -101,6 +102,7 @@ function goBack() {
     <view class="product-content -mt-4 rounded-t-3xl bg-white px-5 pb-8 pt-5">
       <text class="block text-xl font-bold text-stone-900">{{ product.name }}</text>
       <text class="detail-category">{{ product.category }}</text>
+      <text class="member-discount-tag">{{ product.discount_eligible ? '会员可享等级折扣' : '不参与会员折扣' }}</text>
       <text class="mt-2 block text-sm leading-6 text-stone-500">{{ product.description || '暂无描述' }}</text>
       <view class="price-row"><text class="price-label">单价</text><text class="product-price">¥{{ selectedPrice.toFixed(2) }}</text></view>
       <view v-for="group in product.specifications ?? []" :key="group.name" class="specification-block">
@@ -139,6 +141,7 @@ function goBack() {
 .product-placeholder { display: grid; width: 120px; height: 120px; place-items: center; border-radius: 38px; background: rgb(255 255 255 / 55%); color: #ac7957; font-size: 54px; box-shadow: 0 15px 40px rgb(94 61 31 / 8%); }
 .product-content { position: relative; min-height: 48vh; padding-bottom: 110px; border-radius: 24px 24px 0 0; }
 .detail-category { display: inline-block; margin-top: 8px; padding: 4px 8px; border-radius: 10px; background: #f6eee5; color: #a56648; font-size: 10px; }
+.member-discount-tag { display: inline-block; margin: 8px 0 0 6px; padding: 4px 8px; border-radius: 10px; background: #f6efde; color: #967340; font-size: 9px; }
 .price-row { display: flex; align-items: baseline; gap: 8px; margin-top: 18px; }
 .price-label { color: #a49d93; font-size: 10px; }
 .product-price { color: #b9573b; font-size: 24px; font-weight: 750; }

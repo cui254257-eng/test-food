@@ -27,7 +27,13 @@ pub(crate) struct ProductInput {
     pub(crate) price: f64,
     pub(crate) stock: i64,
     pub(crate) status: String,
+    #[serde(default = "default_discount_eligible")]
+    pub(crate) discount_eligible: bool,
     pub(crate) image_data: Option<String>,
+}
+
+fn default_discount_eligible() -> bool {
+    true
 }
 
 #[derive(Debug, Deserialize)]

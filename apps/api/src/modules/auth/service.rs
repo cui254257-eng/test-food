@@ -35,6 +35,14 @@ struct CustomerProfileRecord {
     nickname: String,
     avatar_mime_type: Option<String>,
     avatar_base64: Option<String>,
+    points: i64,
+}
+
+#[derive(Debug, FromRow)]
+struct CustomerTierRecord {
+    level: i64,
+    discount_rate: f64,
+    required_points: i64,
 }
 
 impl AuthService {
@@ -179,7 +187,7 @@ impl AuthService {
 
     async fn profile_by_customer_id(&self, customer_id: i64) -> Result<ProfileResponse, ApiError> {
         let profile = sqlx::query_as::<_, CustomerProfileRecord>(
-            "SELECT nickname, avatar_mime_type, avatar_base64 FROM customers WHERE id = ?",
+            "SELECT nickname, avatar_mime_type, avatar_base64, points FROM customers WHERE id = ?",
         )
         .bind(customer_id)
         .fetch_optional(&self.pool)
@@ -190,9 +198,29 @@ impl AuthService {
             .avatar_mime_type
             .zip(profile.avatar_base64)
             .map(|(mime_type, data)| format!("data:{mime_type};base64,{data}"));
+        let current_tier = sqlx::query_as::<_, CustomerTierRecord>(
+            "SELECT level, CAST(discount_rate AS DOUBLE) AS discount_rate, required_points \
+             FROM membership_tiers WHERE required_points <= ? ORDER BY required_points DESC LIMIT 1",
+        )
+        .bind(profile.points)
+        .fetch_one(&self.pool)
+        .await?;
+        let next_tier = sqlx::query_as::<_, CustomerTierRecord>(
+            "SELECT level, CAST(discount_rate AS DOUBLE) AS discount_rate, required_points \
+             FROM membership_tiers WHERE required_points > ? ORDER BY required_points ASC LIMIT 1",
+        )
+        .bind(profile.points)
+        .fetch_optional(&self.pool)
+        .await?;
         Ok(ProfileResponse {
             nickname: profile.nickname,
             avatar_data_url,
+            member_level: current_tier.level,
+            points: profile.points,
+            discount_rate: current_tier.discount_rate,
+            next_level: next_tier.as_ref().map(|tier| tier.level),
+            next_level_points: next_tier.as_ref().map(|tier| tier.required_points),
+            points_to_next_level: next_tier.map(|tier| tier.required_points - profile.points),
         })
     }
 

@@ -7,8 +7,27 @@ use axum::{
 use crate::{app::AppState, common::ApiError};
 
 use super::dto::{
-    LoginResponse, ProfileResponse, SessionResponse, UpdateProfileInput, WeChatLoginInput,
+    AdminLoginInput, AdminLoginResponse, LoginResponse, ProfileResponse, SessionResponse,
+    UpdateProfileInput, WeChatLoginInput,
 };
+
+pub(crate) async fn admin_login(
+    State(state): State<AppState>,
+    Json(input): Json<AdminLoginInput>,
+) -> Result<Json<AdminLoginResponse>, ApiError> {
+    let token = state.login_admin(&input.username, &input.password)?;
+    Ok(Json(AdminLoginResponse { token }))
+}
+
+pub(crate) async fn admin_session(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+) -> Result<Json<SessionResponse>, ApiError> {
+    state.authenticate_admin(&headers)?;
+    Ok(Json(SessionResponse {
+        authenticated: true,
+    }))
+}
 
 pub(crate) async fn wechat_login(
     State(state): State<AppState>,

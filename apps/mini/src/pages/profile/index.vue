@@ -48,6 +48,14 @@ function openAddresses() {
   uni.navigateTo({ url: "/subpackages/account/pages/address/index" });
 }
 
+function openOrders() {
+  if (!uni.getStorageSync("customer-token")) {
+    openLogin();
+    return;
+  }
+  uni.navigateTo({ url: "/subpackages/account/pages/orders/index" });
+}
+
 function confirmLogout() {
   if (loggingOut.value) return;
   uni.showModal({
@@ -111,8 +119,18 @@ onShow(refreshSession);
       </view>
       <view v-if="!loggedIn" class="login-button" @tap="openLogin">登录</view>
       <view v-else class="member-mark"
-        ><text>会员</text><text class="member-star">✦</text></view
+        ><text>V{{ profile?.member_level ?? 1 }}</text><text class="member-star">✦</text></view
       >
+    </view>
+
+    <view v-if="loggedIn && profile" class="membership-card">
+      <view class="membership-top">
+        <text class="membership-level">V{{ profile.member_level }} 会员</text>
+        <text class="membership-benefit">{{ (profile.discount_rate ?? 1) < 1 ? `${((profile.discount_rate ?? 1) * 10).toFixed(1)} 折` : "暂无折扣" }}</text>
+      </view>
+      <view class="membership-points"><text>当前积分</text><strong>{{ profile.points ?? 0 }}</strong></view>
+      <view v-if="profile.points_to_next_level != null" class="membership-progress-copy">再得 {{ profile.points_to_next_level }} 积分升级 V{{ profile.next_level }}</view>
+      <view v-else class="membership-progress-copy">已达最高等级</view>
     </view>
 
     <view class="service-section">
@@ -121,6 +139,18 @@ onShow(refreshSession);
         <text class="section-caption">PERSONAL SERVICE</text>
       </view>
       <view class="service-card">
+        <view class="service-row" @tap="openOrders">
+          <view class="service-icon order-icon">
+            <text>单</text>
+          </view>
+          <view class="service-copy">
+            <text class="service-title">我的订单</text>
+            <text class="service-caption">查看点餐记录与订单状态</text>
+          </view>
+          <wd-icon name="arrow-right" size="16px" color="#b6aa9d" />
+        </view>
+        <view class="service-divider" />
+
         <view v-if="loggedIn" class="service-row" @tap="openProfileEdit">
           <view class="service-icon profile-icon">
             <image class="service-icon-svg" src="/static/icons/profile.svg" mode="aspectFit" />
@@ -213,6 +243,13 @@ onShow(refreshSession);
   border-radius: 50%;
   content: "";
 }
+.membership-card { margin: 12px 0 24px; padding: 16px 18px; border: 1px solid #e9dac4; border-radius: 18px; background: linear-gradient(125deg, #fffaf1, #f5e8d3); box-shadow: 0 7px 22px rgb(54 41 29 / 4%); }
+.membership-top, .membership-points { display: flex; align-items: center; justify-content: space-between; }
+.membership-level { color: #795530; font-size: 12px; font-weight: 750; }
+.membership-benefit { color: #a35e43; font-size: 11px; font-weight: 700; }
+.membership-points { margin-top: 13px; color: #897d6c; font-size: 10px; }
+.membership-points strong { color: #4d4337; font-size: 23px; }
+.membership-progress-copy { margin-top: 7px; color: #a39787; font-size: 9px; }
 .guest-card {
   min-height: 156px;
   align-items: flex-start;
@@ -377,6 +414,12 @@ onShow(refreshSession);
 .profile-icon {
   background: #f2ebf2;
   color: #8b6b8f;
+}
+.order-icon {
+  background: #fbefe5;
+  color: #ad6948;
+  font-family: inherit;
+  font-size: 14px;
 }
 .service-copy {
   display: flex;

@@ -31,7 +31,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     });
-    let app = create_router(pool, settings.wechat_app_id, settings.wechat_app_secret);
+    let app = create_router(
+        pool,
+        settings.wechat_app_id,
+        settings.wechat_app_secret,
+        settings.admin_api_token,
+        settings.admin_username,
+        settings.admin_password,
+    );
     let address = SocketAddr::new(settings.host.parse()?, settings.port);
     let listener = tokio::net::TcpListener::bind(address).await?;
 

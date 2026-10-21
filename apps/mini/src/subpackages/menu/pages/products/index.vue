@@ -176,6 +176,7 @@ onShow(refreshCart);
             product.description || "—"
           }}</text>
           <text class="catalog-price">¥{{ product.price.toFixed(2) }}</text>
+          <text v-if="product.discount_eligible" class="catalog-member-tag">会员折扣</text>
         </view>
       </view>
     </view>
@@ -345,6 +346,7 @@ onShow(refreshCart);
   font-size: 16px;
   font-weight: 700;
 }
+.catalog-member-tag { display: inline-block; margin-top: 5px; padding: 3px 6px; border-radius: 8px; background: #f7f0e5; color: #9a7849; font-size: 8px; }
 .catalog-empty {
   display: flex;
   min-height: 140px;

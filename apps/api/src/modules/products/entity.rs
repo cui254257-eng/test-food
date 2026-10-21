@@ -13,6 +13,7 @@ pub(crate) struct Product {
     pub(crate) price: f64,
     pub(crate) stock: i64,
     pub(crate) status: String,
+    pub(crate) discount_eligible: bool,
     pub(crate) image_url: Option<String>,
     pub(crate) created_at: String,
     pub(crate) updated_at: String,

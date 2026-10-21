@@ -9,6 +9,8 @@ import {
 } from "@/api/cart";
 import { getAddresses, type Address } from "@/api/addresses";
 import { createOrder, type CreateOrderInput } from "@/api/orders";
+import { getCustomerProfile, type CustomerProfile } from "@/api/profile";
+import { getMembershipConfig, type MembershipConfig } from "@/api/membership";
 import {
   getRestaurantSettings,
   type RestaurantSettings,
@@ -19,6 +21,8 @@ type FulfillmentMode = "dine_in" | "takeaway" | "delivery";
 const lines = ref<CartLine[]>([]);
 const restaurant = ref<RestaurantSettings | null>(null);
 const deliveryAddress = ref<Address | null>(null);
+const memberProfile = ref<CustomerProfile | null>(null);
+const membershipConfig = ref<MembershipConfig | null>(null);
 const mode = ref<FulfillmentMode>("takeaway");
 const tableNumber = ref("");
 const submitting = ref(false);
@@ -40,12 +44,30 @@ const subtotalCents = computed(() =>
     0,
   ),
 );
+const memberDiscountCents = computed(() => {
+  const rate = memberProfile.value?.discount_rate ?? 1;
+  if (!memberProfile.value || rate >= 1) return 0;
+  return lines.value.reduce((total, line) => {
+    if (!line.discount_eligible) return total;
+    const unitCents = Math.round(line.unit_price * 100);
+    const discountedUnitCents = Math.round(unitCents * rate);
+    return total + (unitCents - discountedUnitCents) * line.quantity;
+  }, 0);
+});
 const deliveryFeeCents = computed(() =>
   mode.value === "delivery" && restaurant.value
     ? Math.round(restaurant.value.delivery_fee * 100)
     : 0,
 );
-const totalCents = computed(() => subtotalCents.value + deliveryFeeCents.value);
+const totalCents = computed(() => subtotalCents.value - memberDiscountCents.value + deliveryFeeCents.value);
+const estimatedPoints = computed(() => {
+  const config = membershipConfig.value;
+  if (!config?.spend_step_cents) return 0;
+  const scaledPoints = (subtotalCents.value - memberDiscountCents.value) * config.points_per_step;
+  const wholePoints = Math.floor(scaledPoints / config.spend_step_cents);
+  const remainder = scaledPoints % config.spend_step_cents;
+  return wholePoints + (remainder * 100 > config.spend_step_cents * 6 ? 1 : 0);
+});
 const canSubmit = computed(
   () =>
     lines.value.length > 0 &&
@@ -123,6 +145,22 @@ async function loadRestaurant() {
     if (mode.value === "delivery") await loadDeliveryAddress();
   } catch {
     restaurant.value = null;
+  }
+}
+
+async function loadMembership(requireSession = false) {
+  const token = uni.getStorageSync("customer-token");
+  memberProfile.value = null;
+  try {
+    membershipConfig.value = await getMembershipConfig();
+  } catch {
+    membershipConfig.value = null;
+  }
+  if (!token && !requireSession) return;
+  try {
+    memberProfile.value = await getCustomerProfile();
+  } catch {
+    memberProfile.value = null;
   }
 }
 
@@ -210,6 +248,8 @@ async function submitOrder() {
 
   submitting.value = true;
   try {
+    await loadMembership(true);
+    const pointsToEarn = estimatedPoints.value;
     const input: Omit<CreateOrderInput, "request_key"> = {
       fulfillment_mode: mode.value,
       ...(mode.value === "dine_in"
@@ -232,7 +272,7 @@ async function submitOrder() {
     clearRequestKey();
     uni.showModal({
       title: "订单已提交",
-      content: `订单号 ${order.order_number}\n合计 ¥${money(order.total_cents)} · 待支付\n微信支付暂未接入，15 分钟后自动取消`,
+      content: `订单号 ${order.order_number}\n会员优惠 ¥${money(order.discount_cents)} · 合计 ¥${money(order.total_cents)}\n${pointsToEarn} 积分将在确认收款后到账\n微信支付暂未接入，15 分钟后自动取消`,
       showCancel: false,
       confirmText: "知道了",
     });
@@ -251,6 +291,7 @@ async function submitOrder() {
 onShow(() => {
   refreshCart();
   void loadRestaurant();
+  void loadMembership();
 });
 </script>
 
@@ -441,10 +482,15 @@ onShow(() => {
         <text class="cost-label">商品金额</text
         ><text class="cost-value">¥{{ money(subtotalCents) }}</text>
       </view>
+      <view v-if="memberDiscountCents > 0" class="cost-lines member-discount-line">
+        <text class="cost-label">V{{ memberProfile?.member_level }} 会员优惠</text
+        ><text class="cost-value">-¥{{ money(memberDiscountCents) }}</text>
+      </view>
       <view v-if="mode === 'delivery'" class="cost-lines">
         <text class="cost-label">配送费</text
         ><text class="cost-value">¥{{ money(deliveryFeeCents) }}</text>
       </view>
+      <view v-if="membershipConfig" class="checkout-points">预计获得 {{ estimatedPoints }} 积分 · 确认收款后到账</view>
       <view class="summary-divider" />
       <view class="total-row"
         ><text class="total-caption">应付金额</text
@@ -923,6 +969,8 @@ onShow(() => {
   font-size: 8px;
   line-height: 1.5;
 }
+.member-discount-line .cost-label, .member-discount-line .cost-value { color: #a35e43; }
+.checkout-points { margin-top: 10px; color: #9a805e; font-size: 9px; text-align: right; }
 .submit-order {
   width: 100%;
   margin-top: 34px;

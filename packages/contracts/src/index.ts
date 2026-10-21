@@ -9,6 +9,7 @@ export interface Product {
   price: number
   stock: number
   status: ProductStatus
+  discount_eligible: boolean
   image_url: string | null
   created_at: string
   updated_at: string
@@ -33,5 +34,6 @@ export interface ProductInput {
   price: number
   stock: number
   status: ProductStatus
+  discount_eligible: boolean
   image_data?: string
 }

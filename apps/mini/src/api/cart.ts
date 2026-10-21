@@ -4,6 +4,7 @@ export interface CartLine {
   name: string
   image_url: string | null
   unit_price: number
+  discount_eligible: boolean
   quantity: number
   stock: number
   selections: CartSelection[]
@@ -48,6 +49,7 @@ export function getCartLines(): CartLine[] {
       name: line.name,
       image_url: typeof line.image_url === 'string' ? line.image_url : null,
       unit_price,
+      discount_eligible: typeof line.discount_eligible === 'boolean' ? line.discount_eligible : true,
       quantity,
       stock: Number.isInteger(line.stock) && Number(line.stock) >= 0 ? Number(line.stock) : 99,
       selections,

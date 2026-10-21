@@ -1,5 +1,8 @@
 use axum::{Json, extract::State};
-use axum::{extract::Path, http::StatusCode};
+use axum::{
+    extract::Path,
+    http::{HeaderMap, StatusCode},
+};
 
 use crate::{app::AppState, common::ApiError};
 
@@ -16,8 +19,10 @@ pub(crate) async fn get(
 
 pub(crate) async fn update(
     State(state): State<AppState>,
+    headers: HeaderMap,
     Json(input): Json<RestaurantSettingsInput>,
 ) -> Result<Json<RestaurantSettings>, ApiError> {
+    state.authenticate_admin(&headers)?;
     Ok(Json(state.restaurant_settings.update(input).await?))
 }
 
@@ -29,14 +34,18 @@ pub(crate) async fn announcements(
 
 pub(crate) async fn admin_announcements(
     State(state): State<AppState>,
+    headers: HeaderMap,
 ) -> Result<Json<Vec<Announcement>>, ApiError> {
+    state.authenticate_admin(&headers)?;
     Ok(Json(state.restaurant_settings.all_announcements().await?))
 }
 
 pub(crate) async fn create_announcement(
     State(state): State<AppState>,
+    headers: HeaderMap,
     Json(input): Json<AnnouncementInput>,
 ) -> Result<(StatusCode, Json<Announcement>), ApiError> {
+    state.authenticate_admin(&headers)?;
     Ok((
         StatusCode::CREATED,
         Json(state.restaurant_settings.create_announcement(input).await?),
@@ -45,9 +54,11 @@ pub(crate) async fn create_announcement(
 
 pub(crate) async fn update_announcement(
     State(state): State<AppState>,
+    headers: HeaderMap,
     Path(id): Path<i64>,
     Json(input): Json<AnnouncementInput>,
 ) -> Result<Json<Announcement>, ApiError> {
+    state.authenticate_admin(&headers)?;
     Ok(Json(
         state
             .restaurant_settings
@@ -58,8 +69,10 @@ pub(crate) async fn update_announcement(
 
 pub(crate) async fn delete_announcement(
     State(state): State<AppState>,
+    headers: HeaderMap,
     Path(id): Path<i64>,
 ) -> Result<StatusCode, ApiError> {
+    state.authenticate_admin(&headers)?;
     state.restaurant_settings.delete_announcement(id).await?;
     Ok(StatusCode::NO_CONTENT)
 }

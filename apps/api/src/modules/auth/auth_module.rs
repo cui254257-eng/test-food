@@ -10,6 +10,8 @@ use super::controller;
 
 pub(crate) fn routes() -> Router<AppState> {
     Router::new()
+        .route("/api/admin/login", post(controller::admin_login))
+        .route("/api/admin/session", get(controller::admin_session))
         .route("/api/auth/wechat", post(controller::wechat_login))
         .route("/api/auth/session", get(controller::session))
         .route(

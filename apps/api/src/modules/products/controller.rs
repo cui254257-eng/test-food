@@ -2,7 +2,7 @@ use axum::{
     Json,
     body::Body,
     extract::{Path, Query, State},
-    http::{StatusCode, header},
+    http::{HeaderMap, StatusCode, header},
     response::{IntoResponse, Response},
 };
 
@@ -29,24 +29,30 @@ pub(crate) async fn get(
 
 pub(crate) async fn create(
     State(state): State<AppState>,
+    headers: HeaderMap,
     Json(input): Json<ProductInput>,
 ) -> Result<(StatusCode, Json<Product>), ApiError> {
+    state.authenticate_admin(&headers)?;
     let product = state.products.create(input).await?;
     Ok((StatusCode::CREATED, Json(product)))
 }
 
 pub(crate) async fn update(
     State(state): State<AppState>,
+    headers: HeaderMap,
     Path(id): Path<i64>,
     Json(input): Json<ProductInput>,
 ) -> Result<Json<Product>, ApiError> {
+    state.authenticate_admin(&headers)?;
     Ok(Json(state.products.update(id, input).await?))
 }
 
 pub(crate) async fn delete(
     State(state): State<AppState>,
+    headers: HeaderMap,
     Path(id): Path<i64>,
 ) -> Result<StatusCode, ApiError> {
+    state.authenticate_admin(&headers)?;
     state.products.delete(id).await?;
     Ok(StatusCode::NO_CONTENT)
 }

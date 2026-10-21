@@ -20,7 +20,7 @@ impl ProductsRepository {
         let keyword = query.q.filter(|value| !value.trim().is_empty());
         let status = query.status;
         sqlx::query_as::<_, Product>(
-            "SELECT id, name, category, description, COALESCE(specifications, JSON_ARRAY()) AS specifications, price, stock, status, \
+            "SELECT id, name, category, description, COALESCE(specifications, JSON_ARRAY()) AS specifications, price, stock, status, discount_eligible, \
              CASE WHEN image_base64 IS NULL THEN NULL ELSE CONCAT('/api/products/', id, '/image?v=', \
              DATE_FORMAT(updated_at, '%Y%m%d%H%i%s%f')) END AS image_url, \
              DATE_FORMAT(created_at, '%Y-%m-%dT%H:%i:%s.%fZ') AS created_at, \
@@ -40,7 +40,7 @@ impl ProductsRepository {
 
     pub(crate) async fn find_by_id(&self, id: i64) -> Result<Option<Product>, sqlx::Error> {
         sqlx::query_as::<_, Product>(
-            "SELECT id, name, category, description, COALESCE(specifications, JSON_ARRAY()) AS specifications, price, stock, status, \
+            "SELECT id, name, category, description, COALESCE(specifications, JSON_ARRAY()) AS specifications, price, stock, status, discount_eligible, \
              CASE WHEN image_base64 IS NULL THEN NULL ELSE CONCAT('/api/products/', id, '/image?v=', \
              DATE_FORMAT(updated_at, '%Y%m%d%H%i%s%f')) END AS image_url, \
              DATE_FORMAT(created_at, '%Y-%m-%dT%H:%i:%s.%fZ') AS created_at, \
@@ -62,8 +62,8 @@ impl ProductsRepository {
             .map(|(mime_type, encoded)| (Some(mime_type.as_str()), Some(encoded.as_str())))
             .unwrap_or((None, None));
         let result = sqlx::query(
-            "INSERT INTO products (name, category, description, specifications, price, stock, status, image_mime_type, image_base64) \
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO products (name, category, description, specifications, price, stock, status, discount_eligible, image_mime_type, image_base64) \
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         )
         .bind(input.name.trim())
         .bind(input.category.trim())
@@ -72,6 +72,7 @@ impl ProductsRepository {
         .bind(input.price)
         .bind(input.stock)
         .bind(input.status)
+        .bind(input.discount_eligible)
         .bind(image_mime_type)
         .bind(image_base64)
         .execute(&self.pool)
@@ -92,7 +93,7 @@ impl ProductsRepository {
         }
         let result = match image.as_ref() {
             Some((mime_type, encoded)) => sqlx::query(
-                "UPDATE products SET name = ?, category = ?, description = ?, specifications = ?, price = ?, stock = ?, status = ?, \
+                "UPDATE products SET name = ?, category = ?, description = ?, specifications = ?, price = ?, stock = ?, status = ?, discount_eligible = ?, \
                  image_mime_type = ?, image_base64 = ? WHERE id = ?",
             )
             .bind(input.name.trim())
@@ -102,13 +103,14 @@ impl ProductsRepository {
             .bind(input.price)
             .bind(input.stock)
             .bind(input.status)
+            .bind(input.discount_eligible)
             .bind(mime_type)
             .bind(encoded)
             .bind(id)
             .execute(&self.pool)
             .await?,
             None => sqlx::query(
-                "UPDATE products SET name = ?, category = ?, description = ?, specifications = ?, price = ?, stock = ?, status = ? WHERE id = ?",
+                "UPDATE products SET name = ?, category = ?, description = ?, specifications = ?, price = ?, stock = ?, status = ?, discount_eligible = ? WHERE id = ?",
             )
             .bind(input.name.trim())
             .bind(input.category.trim())
@@ -117,6 +119,7 @@ impl ProductsRepository {
             .bind(input.price)
             .bind(input.stock)
             .bind(input.status)
+            .bind(input.discount_eligible)
             .bind(id)
             .execute(&self.pool)
             .await?,

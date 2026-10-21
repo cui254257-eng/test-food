@@ -2,7 +2,7 @@ use axum::{
     Json,
     body::Body,
     extract::{Path, State},
-    http::header,
+    http::{HeaderMap, header},
     response::{IntoResponse, Response},
 };
 
@@ -19,17 +19,21 @@ pub(crate) async fn list(State(state): State<AppState>) -> Result<Json<Vec<Banne
 
 pub(crate) async fn upload(
     State(state): State<AppState>,
+    headers: HeaderMap,
     Json(input): Json<UploadBannerDto>,
 ) -> Result<(axum::http::StatusCode, Json<Banner>), ApiError> {
+    state.authenticate_admin(&headers)?;
     let banner = state.banners.upload(input).await?;
     Ok((axum::http::StatusCode::CREATED, Json(banner)))
 }
 
 pub(crate) async fn update(
     State(state): State<AppState>,
+    headers: HeaderMap,
     Path(id): Path<i64>,
     Json(input): Json<UpdateBannerDto>,
 ) -> Result<Json<Banner>, ApiError> {
+    state.authenticate_admin(&headers)?;
     Ok(Json(state.banners.update(id, input).await?))
 }
 
@@ -67,8 +71,10 @@ pub(crate) async fn background_image(
 
 pub(crate) async fn delete(
     State(state): State<AppState>,
+    headers: HeaderMap,
     Path(id): Path<i64>,
 ) -> Result<axum::http::StatusCode, ApiError> {
+    state.authenticate_admin(&headers)?;
     state.banners.delete(id).await?;
     Ok(axum::http::StatusCode::NO_CONTENT)
 }

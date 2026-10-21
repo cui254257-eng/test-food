@@ -4,6 +4,12 @@ import { API_BASE_URL, request } from './request'
 export interface CustomerProfile {
   nickname: string
   avatar_data_url: string | null
+  member_level: number
+  points: number
+  discount_rate: number
+  next_level: number | null
+  next_level_points: number | null
+  points_to_next_level: number | null
 }
 
 function rememberProfile(profile: CustomerProfile) {
